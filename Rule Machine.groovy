@@ -1,5 +1,5 @@
 /**
- *  Rule Machine
+ *  Rule Machine - Modified
  *
  *  Copyright 2015, 2016 Bruce Ravenel
  *
@@ -7,24 +7,7 @@
  *
  *	Version History
  *
- *	1.9.0	24 Mar 2016		Updates for Rule, small bug fixes
- *	1.8.2	9 Mar 2016		Changed startup page for installation
- *	1.8.1	3 Mar 2016		Changed method of getting Rule version
- *	1.8.0	2 Mar 2016		Clean up, added Door control
- *	1.7.6	24 Feb 2016		Added User Guide link, fixed Rule truth mechanism
- *	1.7.5	21 Feb 2016		Improved custom command selection
- *	1.7.4	20 Feb 2016		Added saved command display, UI improvements
- *	1.7.3	14 Feb 2016		Improved Rule Machine initialization, fixed Delete custom commands bug
- *	1.7.2	8 Feb 2016		Added set Boolean for Rules
- *	1.7.1	5 Feb 2016		Added update Rule
- *	1.7.0	31 Jan 2016		Added run Rule actions
- *	1.6.6	10 Jan 2016		Improved method of getting custom device commands
- *	1.6.5	1 Jan 2016		Added version numbers to main page
- *	1.6.4	30 Dec 2015		Multi-commands
- *	1.6.3	26 Dec 2015		UI improvements and icon per Michael Struck
- *	1.6.2	25 Dec 2015		null parameter value patch in expert, maxwell
- *	1.6.1	24 Dec 2015		UI improvement
- *	1.6.0	23 Dec 2015		Added expert commands per Mike Maxwell
+ *	2.0.0 My personal use case updates
  *
  *  This software if free for Private Use. You may use and modify the software without distributing it.
  *  
@@ -37,11 +20,11 @@
  */
 
 definition(
-	name: "Rule Machine",
+	name: "Rule Machine - Modified",
 	singleInstance: true,
 	namespace: "bravenel",
 	author: "Bruce Ravenel and Mike Maxwell",
-	description: "Rule Machine",
+	description: "Rule Machine - Modified",
 	category: "My Apps",
 	iconUrl: "https://raw.githubusercontent.com/bravenel/Rule-Trigger/master/smartapps/bravenel/RuleMachine.png",
 	iconX2Url: "https://raw.githubusercontent.com/bravenel/Rule-Trigger/master/smartapps/bravenel/RuleMachine%402x.png",
@@ -77,7 +60,7 @@ def mainPage() {
         	section ("Remove Rule Machine"){
         		href "removePage", description: "Tap to remove Rule Machine and Rules", title: ""
         	}
-			section ("Version 1.9.0a/" + (nApps > 0 ? "${childApps[0].appVersion()}" : "---")) { }
+			section ("Version 2.0.0/" + (nApps > 0 ? "${childApps[0].appVersion()}" : "---")) { }
     	}
     }
 }
@@ -98,7 +81,7 @@ def updated() {
 def firstRun() {
 	state.setup = true
 	state.ruleSubscribers = [:]
-    dynamicPage(name: "firstPage", title: "Hit Done to install Rule Machine", install: true, uninstall: false) { }
+    dynamicPage(name: "firstPage", title: "Hit Done to install Rule Machine - Modified", install: true, uninstall: false) { }
 }
 
 def childVersion() {
