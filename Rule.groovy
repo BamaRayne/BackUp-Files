@@ -1,59 +1,13 @@
 /**
- *  Rule
+ *  Rule - Modified
  *
  *  Copyright 2015, 2016 Bruce Ravenel
  *
- *  Version 1.9.1f   3 Apr 2016
+ *  Version 2.0.0   3 Apr 2016
  *
  *	Version History
  *
- *	1.9.1	26 Mar 2016		Added yearly period, and two periodic trigger events
- *	1.9.0	24 Mar 2016		Added periodic trigger, bug fixes re ZWN buttons
- *	1.8.6	19 Mar 2016		Bug fixes re private Boolean as trigger event
- *	1.8.5	13 Mar 2016		Added support for single button device, more private Boolean options, emergency heat
- *	1.8.4	11 Mar 2016		Strengthened code pertaining to evaluation of malformed rules
- *	1.8.3	3 Mar 2016		Changed method of reporting version number to Rule Machine
- *	1.8.2	2 Mar 2016		Reorganized UI for selecting Actions, group pages, for speed of mobile app
- *	1.8.1	2 Mar 2016		Added NOT for rules: NOT Condition and NOT (sub-rule) 
- *	1.8.0	2 Mar 2016		Major code cleanup; added random color, decimal for energy & power, and door control
- *	1.7.16	28 Feb 2016		Added cancel for delay set private, and delay for restore with cancel
- *	1.7.15	24 Feb 2016		Minor UI cleanup, bug fixes
- *	1.7.14	23 Feb 2016		Added adjust thermostat setpoints, delay Set Private Boolean
- *	1.7.13	21 Feb 2016		Improved custom command selection
- *	1.7.12	19 Feb 2016		Added Private Boolean enable/disable, capture/restore color hue and saturation
- *	1.7.11	15 Feb 2016		Further UI redesign to better distinguish triggers, added seconds for delayed on/off
- *	1.7.10	9 Feb 2016		Added Music player condition, fixed Days of Week schedule bug
- *	1.7.9	8 Feb 2016		Added set Boolean for other Rules, and Send notification event
- *	1.7.8	7 Feb 2016		Added Evaluate Rule after Delay (loop possible), and Private Boolean
- *	1.7.7	6 Feb 2016		UI cleanup and organization, added capture/restore for switches/dimmers
- *	1.7.6	5 Feb 2016		Added action to update rule(s) to fix broken schedules due to ST issues
- *	1.7.5	3 Feb 2016		Removed use of unschedule() for delay cancel, to avoid ST issues
- *	1.7.4	2 Feb 2016		Redesign of UI to make it clearer between Triggers and Rules
- *	1.7.3	2 Feb 2016		Bug fix for multi-button device with more than 4 buttons
- *	1.7.2	31 Jan 2016		Added mode based dimming action, and cause rule actions action
- *	1.7.1	30 Jan 2016		Added support for more buttons than 4 on button device, now as many as 20
- *	1.7.0	27 Jan 2016		Fixed thermostat mode trigger/condition, added thermostat operating state condition
- *	1.6.13	17 Jan 2016		Added Text to speech support
- *	1.6.12	10 Jan 2016		Bug fix re removing parts of a rule
- *	1.6.11	8 Jan 2016		Added offset to compare to device, fixed bugs in compare to device
- *	1.6.10	6 Jan 2016		Returned Delay on/off pending cancel per user request, further debug of rule evaluation
- *	1.6.9	6 Jan 2016		Fixed bugs related to presence in triggers, added Off as disable option, fixed bug in rule evaluation
- *	1.6.8	1 Jan 2016		Added version numbers to main Rule Machine page, multi SMS
- *	1.6.7	31 Dec 2015		Added speak to send message
- *	1.6.6	30 Dec 2015		Expert multi-commands added per Maxwell
- *	1.6.5	29 Dec 2015		Added action to set dimmers from a track dimmer, restored turn on/off after delay action
- *	1.6.4	29 Dec 2015		Added action to adjust dimmers +/-, fixed time bug for triggered rule, fixed dimmer level condition bug
- *	1.6.3	26 Dec 2015		Added color temperature bulb set, per John-Paul Smith
- *	1.6.2	26 Dec 2015		New delay selection, minor bug fixes, sub-rule input improvements
- *	1.6.1	24 Dec 2015		Added ability to send device name with push or SMS, show rule truth on main page
- *	1.6.0	23 Dec 2015		Added expert commands per Mike Maxwell, and actions for camera to take photo burst
- *	1.5.11	23 Dec 2015		Fixed bug that prevented old triggers from running, minor UI change for rule display
- *	1.5.10	22 Dec 2015		Require capability choice for all but last rule or trigger
- *	1.5.9	21 Dec 2015		Fixed overlap of Days of Week selection
- *	1.5.8	20 Dec 2015		More repair for that same mode bug; fixed so triggered-rule not tested at install
- *	1.5.7	19 Dec 2015		Fixed bug re: selecting mode as condition/trigger, UI display
- *	1.5.6	18 Dec 2015		Fixed bug re: old triggers not editable
- *	1.5.5	17 Dec 2015		Added milliseconds to Delayed off, uses dev.off([delay: msec]) instead of runIn()
+ *	2.0.0 My own version
  *
  *  This software if free for Private Use. You may use and modify the software without distributing it.
  *  
@@ -66,12 +20,12 @@
  */
 
 definition(
-	name: "Rule",
+	name: "Rule - Modified",
 	namespace: "bravenel",
 	author: "Bruce Ravenel",
-	description: "Rule",
+	description: "Rule - Modified",
 	category: "Convenience",
-	parent: "bravenel:Rule Machine",
+	parent: "bravenel:Rule Machine - Modified",
 	iconUrl: "https://raw.githubusercontent.com/bravenel/Rule-Trigger/master/smartapps/bravenel/RuleMachine.png",
 	iconX2Url: "https://raw.githubusercontent.com/bravenel/Rule-Trigger/master/smartapps/bravenel/RuleMachine%402x.png",
 )
