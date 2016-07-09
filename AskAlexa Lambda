@@ -30,12 +30,11 @@ exports.handler = function( event, context ) {
    var versionNum = '115';
    var https = require( 'https' );
    // Paste app code here between the breaks------------------------------------------------
-   var IName = 'Home';
+    var IName = 'Home';
     var STappID = '';
     var STtoken = '';
     var url='https://graph.api.smartthings.com:443/api/smartapps/installations/' + STappID + '/' ;
-
-   //---------------------------------------------------------------------------------------				
+//---------------------------------------------------------------------------------------				
 var cardName ="";
 var areWeDone = false;
 console.log (event.request.type);
@@ -95,7 +94,7 @@ process = true;
 cardName = "SmartThings Home Operation";
 }
         else if (event.request.intent.name == "EndOperation") {
-            var response = [" Ok. It has been my pleasure, thank you ", " Fine, I didn't want to do anything else anyway.", " Ok. Maybe Later, if I feel like it. ", " Ok. I am here if you need me. "];
+            var response = [" Ok. It has been my pleasure, thank you ", " Have a wonderful day ", " Ok. Maybe Later, all you have to do is ask. ", " Ok. I am here if you need me. "];
             var resText =response[Math.floor(Math.random() * 4)];
             output(resText, context, "Amazon No", true);
         }
