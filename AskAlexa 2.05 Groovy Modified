@@ -586,8 +586,7 @@ def pageOtherReport(){
         section ("Motion Sensors"){
             input "voiceMotion", "capability.motionSensor", title: "Motion Sensors To Report Their Status...", multiple: true, required: false, submitOnChange: true
             if (voiceMotion) input "voiceMotionOnly", "bool",title: "Report Only Sensors That Read 'Active'", defaultValue: false
-            if (voiceMotion) input "voiceMotionEvt", "bool",title: "Report The Time Of The Last Movement Event", defaultValue: false
-            if (voiceMotion) input "voiceSpcEvt", "bool",title: "Report ONLY the 'Time' of the Last Movement", defaultValue: false
+            if (voiceMotion) input "voiceMotionEvt", "bool",title: "Report The Time Of The Last Movement", defaultValue: false 
         }
         section("Power Meters"){
        		input "voicePower", "capability.powerMeter", title: "Power Meters To Report Energy Use...", multiple: true, required: false
@@ -727,7 +726,6 @@ mappings {
       path("/h") { action: [GET: "processSmartHome"] }
       path("/l") { action: [GET: "processList"] }
       path("/v") { action: [GET: "processVersion"] }
-      path("/t") { action: [GET: "processTts"] } 
       path("/setup") { action: [GET: "displayData"] }
 }
 //--------------------------------------------------------------
@@ -762,11 +760,6 @@ def processDevice() {
     if (!count) { outputTxt = "I had some problems finding the device you specified. %1%" }
     sendJSON(outputTxt, lVer)
 }
-def processTts() {
-	def tts = params.ttstext
- //   response.tellWithCard(text, heading, cardText);
-	return ["voiceOutput":"Excuse me,  "+ tts]
-}
 //List Request
 def processList(){
 	log.debug "List command received with params $params"
@@ -797,7 +790,7 @@ def processList(){
        			: "You don't have any humidity sensors selected in your Ask Alexa SmartApp. "
     }
     if (listType=="presence" || listType=="presence sensor" || listType=="presence sensors"){
-     	outputTxt = presence && presence.size()>1 ? "The available presence sensors are: " +  getList(presence) + ". "
+     	outputTxt = presence && presence.size()>1 ? "The available presence sensors are: " +  getList(presence) + ". " 
         	: presence && presence.size()==1 ? "The "+ getList(presence)+ " is the only presence sensor available. "    
        			: "You don't have any presence sensors selected in your Ask Alexa SmartApp. "
     }
@@ -860,6 +853,7 @@ def processList(){
     }
     if (listType == "group" || listType == "groups" || listType == "macro" || listType == "macros") outputTxt ="Please be a bit more specific about which group or macros you want me to list. You can ask me about 'macro groups', 'device groups', 'control macros' and 'voice reports'.  "
     if (listType == "sensor" || listType == "sensors") outputTxt ="Please be a bit more specific about what kind of sensors you want me to list. You can ask me to list items like 'water sensors', 'door sensors', 'presence sensors' or 'motion sensors'. "
+    
     if (outputTxt == "") { 
     	outputTxt = "I didn't understand what you wanted information about. Be sure you have properly run the setup and populated the developer section with the device names and try again. %1%"
     }
@@ -1020,7 +1014,7 @@ def processSmartHome() {
         }
         if (!outputTxt) outputTxt ="To run SmartThings' routines, ask me to run the routine by its full name. For a list of available routines, simply say, 'ask ${invocationName} to list routines'. %1%"
         else if (!routines) outputTxt = "You can not run SmartThings Routines because you do not have this option enabled in the Ask Alexa SmartApp. Please enable this feature and try again. "
-	}
+    }
     if (!outputTxt) outputTxt = "I didn't understand what you wanted me to do. %1%" 
     if (outputTxt && !outputTxt.endsWith("%")) outputTxt +="%2%"
     sendJSON(outputTxt, lVer)
@@ -1272,7 +1266,7 @@ def getReply(devices, type, dev, op, num, param){
             result += lux ? "The illuminance at this device's location is ${lux} lux. " : ""
             result += temp && type != "thermostat" && type != "humidity" && type != "temperature" ? "In addition, the temperature reading from this device is ${temp} degrees. " : ""
 			result += motion == "active" && type != "motion" ? "This device is also a motion sensor, and it is currently reading movement. " : ""
-			result += accel == "active" ? "This device has a vibration sensor, and it is currently reading movement. " : ""
+ 			result += accel == "active" ? "This device has a vibration sensor, and it is currently reading movement. " : ""
         }
         if (STdevice.currentValue("battery") && batteryWarn){
 			def battery = STdevice.currentValue("battery")
@@ -1736,22 +1730,21 @@ def presenceReport(){
 def motionReport(){
 	String result = "" 
     def currVal
-	if (voiceMotionOnly) {
+    if (voiceMotionOnly) {
         if (voiceMotion.latestValue("motion").contains("active")) {
         	voiceMotion.each { deviceName->
-            	if (deviceName.latestValue("motion")=="active") result += "${deviceName} is reading motion. "
+            	if (deviceName.latestValue("motion")=="active") result += "The ${deviceName} is reading motion. "
     		}
         }
-    	else result += "All of the motion sensors are reading no movement. "
     }
-    if (voiceSpcEvt) result += getSpcEvt(voiceMotion, "", "active", "sensor")	
-  	else if (voiceMotionEvt) result += getLastEvt(voiceMotion, "movement", "active", "sensor")	
 	else {
 		voiceMotion.each {deviceName->
 			currVal = [active: "movement", inactive: "no movement"][deviceName.latestValue("motion")] ?: deviceName.latestValue("motion")
-      	result += "${deviceName} is reading " + currVal + ". "}
+            result += "The ${deviceName} is reading " + currVal + ". "
+        }
 	}
- 	result 
+    if (voiceMotionEvt) result += getLastEvt(voiceMotion, "movement", "active", "sensor")	
+    return result 
 }
 def powerReport(){
 	String result = ""
@@ -1833,8 +1826,8 @@ def batteryReport(){
     result
 }
 def waterReport(){
-    def count = 0
     String result = ""
+    def count = 0
 	for (device in voiceWater) if (device.latestValue("water") != "dry") count ++
         if (!voiceWetOnly) for (deviceName in voiceWater) { result += "The ${deviceName} is ${deviceName.latestValue("water")}. " }
         else if (count){
@@ -2431,7 +2424,7 @@ def weatherAlerts(){
 									if (!warning.endsWith('.')) warning += '.'										// close off this warning with a period                            			
                            			msg += warn + warning + ' '
                            			warn = ""
-                               }
+                                }
                             }
                         }
                     }	
@@ -2468,25 +2461,6 @@ def toggleState(swDevices){
         def newstate = currState == "off" ? "on" : "off"
         it?."$newstate"()
     }
-}
-private getSpcEvt(devGroup, evtTxt, searchVal, devTxt){
-    def devEvt, evtLog=[],  spcEvt="I could not find any ${evtTxt} events in the log. "
-        devGroup.each{ deviceName-> devEvt= deviceName.events()
-            devEvt.each {
-                if (it.value && it.value==searchVal) evtLog << [device: deviceName, time: it.date.getTime(), desc: it.descriptionText]
-            }
-       	 }
-    if (evtLog.size()>0){
-        evtLog.sort({it.time})
-        evtLog.reverse(true)
-        def today = new Date(now()).format("EEEE, MMMM dd, yyyy", location.timeZone)
-        def eventDay = new Date(evtLog.time[0]).format("EEEE, MMMM dd, yyyy", location.timeZone)
-        def voiceDay = today == eventDay ? "today" : "On " + eventDay  
-        def evtTime = new Date(evtLog.time[0]).format("h:mm aa", location.timeZone)
-        def multipleTxt = devGroup.size() >1 ? "within the monitored group was the ${evtLog.device[0]} ${devTxt}" : "was"
-        spcEvt = "${evtTxt} ${multipleTxt} ${voiceDay} at ${evtTime}. "
-    }    
-    return spcEvt
 }
 private setColoredLights(switches, color, level, type){
 	def getColorData = parent.fillColorSettings().find {it.name==color}
@@ -2673,8 +2647,8 @@ private def textVersion() {
     def lambdaVersion = state.lambdaCode ? "\n" + state.lambdaCode : ""
     return "${version}${lambdaVersion}"
 }
-private def versionInt(){ return 204 }
-private def versionLong(){ return "2.0.4" }
+private def versionInt(){ return 205 }
+private def versionLong(){ return "2.0.5" }
 private def textCopyright() {return "Copyright © 2016 Michael Struck" }
 private def textLicense() {
 	def text = "Licensed under the Apache License, Version 2.0 (the 'License'); "+
