@@ -582,12 +582,14 @@ def pageOtherReport(){
             if (voicePresence)input "voicePresentOnly", "bool", title: "Report Only Sensors That Are 'Not Present'", defaultValue: false
             if (voicePresence)input "voicePresentEvt", "bool",title: "Report The Time Of The Last Arrival", defaultValue: false 
             if (voicePresence)input "voiceGoneEvt", "bool",title: "Report The Time Of The Last Departure", defaultValue: false 
+        	if (voicePresence)input "voiceSpcEvt", "bool",title: "Report ONLY the 'Time' of the Last Arrival", defaultValue: false
         }
         section ("Motion Sensors"){
             input "voiceMotion", "capability.motionSensor", title: "Motion Sensors To Report Their Status...", multiple: true, required: false, submitOnChange: true
             if (voiceMotion) input "voiceMotionOnly", "bool",title: "Report Only Sensors That Read 'Active'", defaultValue: false
-            if (voiceMotion) input "voiceMotionEvt", "bool",title: "Report The Time Of The Last Movement", defaultValue: false 
-        }
+            if (voiceMotion) input "voiceMotionEvt", "bool",title: "Report The Time Of The Last Movement Event", defaultValue: false 
+        	if (voiceMotion) input "voiceSpcEvt", "bool",title: "Report ONLY the 'Time' of the Last Movement", defaultValue: false
+         }
         section("Power Meters"){
        		input "voicePower", "capability.powerMeter", title: "Power Meters To Report Energy Use...", multiple: true, required: false
             if (voicePower) input "voicePowerOn", "bool", title: "Report Only Meters Drawing Power", defaultValue: false
@@ -1171,14 +1173,14 @@ def getReply(devices, type, dev, op, num, param){
                 	if (op=="low" && dimmerLow) num = dimmerLow else if (op=="low" && dimmerLow=="") num =0 
                     if (op=="medium" && dimmerMed) num = dimmerMed else if (op=="medium" && !dimmerMed) num = 0 
                     if (op=="high" && dimmerHigh) num = dimmerHigh else if (op=="high" && !dimmerhigh) num = 0 
-                    if (num>0) overRideMsg = "I am turning the ${STdevice} to ${op}, or a value of ${num}%. "
+                    if (num>0) overRideMsg = "The ${STdevice} is now set to ${op}. " //, or a value of ${num}%. "
                     if (num==0) overRideMsg = "You don't have a default value set up for the '${op}' level. I am not making any changes to the ${STdevice}. "
                 }
                 if ((type == "switch") || ((type=="level" || type == "color") && num==0 )){
                     if ((type=="level" || type == "color") && num==0 && op=="undefined" && param=="undefined") op="off"
                 	if (op=="on" || op=="off"){
                 		STdevice."$op"() 
-                        result = overRideMsg ? overRideMsg: "I am turning the ${STdevice} ${op}. "
+                        result = overRideMsg ? overRideMsg: "The ${STdevice} is now ${op}. "
                     }
                     if (op=="toggle") {
         				def oldstate = STdevice.currentValue("switch")
@@ -1725,26 +1727,28 @@ def presenceReport(){
     else voicePresence.each {deviceName->result += "${deviceName} is " + deviceName.latestValue("presence") + ". " }
     if (voicePresentEvt) result += getLastEvt(voicePresence, "arrival", "present", "presence sensor")
     if (voiceGoneEvt) result += getLastEvt(voicePresence, "departure", "not present", "presence sensor")
+    if (voiceSpcEvt) result += getSpcEvt(voiceMotion, "", "active", "sensor")
     result
 }
 def motionReport(){
 	String result = "" 
-    def currVal
-    if (voiceMotionOnly) {
+    	def currVal
+if (voiceMotionOnly) {
         if (voiceMotion.latestValue("motion").contains("active")) {
         	voiceMotion.each { deviceName->
-            	if (deviceName.latestValue("motion")=="active") result += "The ${deviceName} is reading motion. "
+            	if (deviceName.latestValue("motion")=="active") result += "${deviceName} is reading motion. "
     		}
         }
+    	else result += "All of the motion sensors are reading no movement. "
     }
+    if (voiceSpcEvt) result += getSpcEvt(voiceMotion, "", "active", "sensor")	
+  	else if (voiceMotionEvt) result += getLastEvt(voiceMotion, "movement", "active", "sensor")	
 	else {
 		voiceMotion.each {deviceName->
 			currVal = [active: "movement", inactive: "no movement"][deviceName.latestValue("motion")] ?: deviceName.latestValue("motion")
-            result += "The ${deviceName} is reading " + currVal + ". "
-        }
+      	result += "${deviceName} is reading " + currVal + ". "}
 	}
-    if (voiceMotionEvt) result += getLastEvt(voiceMotion, "movement", "active", "sensor")	
-    return result 
+ 	result 
 }
 def powerReport(){
 	String result = ""
@@ -2629,6 +2633,25 @@ def getLastEvent(device, count) {
     result += diff > 1 ? "There were ${diff} items that were skipped due to the description being empty. " : diff==1 ? "There was one item that was skipped due to the description being a null value. " : ""
     if (evtCount==0) result="There were no past events in the device log. "
     return result
+}
+private getSpcEvt(devGroup, evtTxt, searchVal, devTxt){
+    def devEvt, evtLog=[],  spcEvt="I could not find any ${evtTxt} events in the log. "
+        devGroup.each{ deviceName-> devEvt= deviceName.events()
+            devEvt.each {
+                if (it.value && it.value==searchVal) evtLog << [device: deviceName, time: it.date.getTime(), desc: it.descriptionText]
+            }
+       	 }
+    if (evtLog.size()>0){
+        evtLog.sort({it.time})
+        evtLog.reverse(true)
+        def today = new Date(now()).format("EEEE, MMMM dd, yyyy", location.timeZone)
+        def eventDay = new Date(evtLog.time[0]).format("EEEE, MMMM dd, yyyy", location.timeZone)
+        def voiceDay = today == eventDay ? "today" : "On " + eventDay  
+        def evtTime = new Date(evtLog.time[0]).format("h:mm aa", location.timeZone)
+        def multipleTxt = devGroup.size() >1 ? "within the monitored group was the ${evtLog.device[0]} ${devTxt}" : "was"
+        spcEvt = "${evtTxt} ${multipleTxt} ${voiceDay} at ${evtTime}. "
+    }    
+    return spcEvt
 }
 def sendJSON(outputTxt, lVer){
     def LambdaVersion = lVer as int, contOption=""
