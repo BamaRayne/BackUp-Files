@@ -147,7 +147,7 @@ var url='https://graph.api.smartthings.com:443/api/smartapps/installations/' + S
                 }
                 if (speechText.endsWith("%2%")) { 
                 	if (contOptions.slice(1,-2)=="1"){
-                    	responses = ["Would you like to do something else? "," Do You Want to do anything else? "," What else would you like to do? "];
+                    	responses = ["Would you like to do something else? "," Do You Want to do anything else? "," Would you like to try something else? "];
                     	resText =responses[Math.floor(Math.random() * 3)];
                     	speechText = speechText.slice(0, -3);
                     	speechText += resText;
@@ -159,7 +159,7 @@ var url='https://graph.api.smartthings.com:443/api/smartapps/installations/' + S
                 }
                 if (speechText.endsWith("%3%")) { 
                 	if (contOptions.slice(2,-1)=="1"){
-                    	responses = [ " Would you like to do something else? "," Do You Want anything else? "," What else would you like to do? "];
+                    	responses = [ " Would you like to do something else? "," Do You Want anything else? "," Would you like to try something else? "];
                     	resText =responses[Math.floor(Math.random() * 3)];
                     	speechText = speechText.slice(0, -3);
                     	speechText += resText;
