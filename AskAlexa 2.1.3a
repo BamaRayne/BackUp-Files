@@ -74,7 +74,7 @@ preferences {
             	page name:"pageWeatherForecast"
             page name:"pagePresenceReport"
             page name:"pageSpeakerReport"
-}
+           }
 def pageMain() { if (!parent) mainPageParent() else mainPageChild() }
 def mainPageParent() {
     dynamicPage(name: "mainPageParent", install: true, uninstall: false) {
@@ -157,7 +157,8 @@ def pageSpeakers(){
         section {paragraph "Connected Speakers", image: "https://raw.githubusercontent.com/MichaelStruck/SmartThingsPublic/master/img/speaker.png"}
         section("Choose the devices to interface") {
             input "speakers", "capability.musicPlayer", title: "Choose Speakers (Speaker Control, Status)", multiple: true, required: false 
-        	if (sonosCMD && speakers && sonosMemoryCount) {
+        	input "notifications", "capability.speechSynthesis", title: "Choose your audio notification device", multiple: true, required: false
+            if (sonosCMD && speakers && sonosMemoryCount) {
             	href "pageMemorySlots", title: "SONOS Memory Slots", description: memoryDesc(), state: memoryState()
             }
         }	
@@ -394,8 +395,8 @@ def mainPageChild(){
     dynamicPage(name: "mainPageChild", title: "Voice Macro Settings", install: true, uninstall: true) {
     	section {
             label title:"Voice Macro Name", required: true, image: "https://raw.githubusercontent.com/MichaelStruck/SmartThingsPublic/master/img/speak.png"
-            input "macroType", "enum", title: "Macro Type...", options: [["Control":"Control (Run/Execute)"],["CoRE":"CoRE Trigger (Run/Execute)"],["Group":"Device Group (On/Off/Toggle, Lock/Unlock, etc.)"],["GroupM":"Macro Group (Run/Execute)"],["Voice":"Voice Reporting (Run/Execute) "]], required: false, multiple: false, submitOnChange:true
-            def fullMacroName=[GroupM: "Macro Group",CoRE:"CoRE Trigger", Control:"Control", Group:"Device Group", Voice:"Voice Reporting"][macroType] ?: macroType
+            input "macroType", "enum", title: "Macro Type...", options: [["Control":"Control (Run/Execute)"],["CoRE":"CoRE Trigger (Run/Execute)"],["Group":"Device Group (On/Off/Toggle, Lock/Unlock, etc.)"],["GroupM":"Macro Group (Run/Execute)"],["Voice":"Voice Reporting (Run/Execute) "],["Notifications":"Text To Speech"]], required: false, multiple: false, submitOnChange:true
+            def fullMacroName=[GroupM: "Macro Group",CoRE:"CoRE Trigger", Control:"Control", Group:"Device Group", Voice:"Voice Reporting", Notifications:"Text To Speech"][macroType] ?: macroType
             if (macroType) {
             	href "page${macroType}", title: "${fullMacroName} Settings", description: macroTypeDesc(), state: greyOutMacro()
                 input "noteFeed", "bool", title: "Post To Notification Feed When Triggered", defaultValue: false, submitOnChange: true
@@ -2892,6 +2893,7 @@ def mapDevices(){
 	if (motion) result << [devices: motion, type : "motion"]
 	if (presence) result << [devices: presence, type : "presence"]
     if (acceleration) result << [devices: acceleration, type : "acceleration"]
+    if (notifications) result << [devices: speakers, type : "speech"]
     return result
 }
 def upDown(device, type, op, num){
